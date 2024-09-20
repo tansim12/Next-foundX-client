@@ -11,13 +11,13 @@ type TRole = keyof typeof roleBaseRoute;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const user = {
-    name: "tansim",
-    role: "ADMIN",
-    // role: "USER",
-    token: "abc",
-  };
-  // const user = undefined;
+  // const user = {
+  //   name: "tansim",
+  //   role: "ADMIN",
+  //   // role: "USER",
+  //   token: "abc",
+  // };
+  const user = undefined;
 
   if (!user) {
     if (AuthRoutes.includes(pathname)) {
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (user?.role && roleBaseRoute[user?.role as TRole]) {
+  if (user?.role && roleBaseRoute[user?.role as TRole ]) {
     const routes = roleBaseRoute[user?.role as TRole];
     if (routes.some((route) => route.test(pathname))) {
       return NextResponse.next();
