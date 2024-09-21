@@ -2,9 +2,8 @@
 
 import FXForm from "@/src/components/Form/FXForm";
 import FXInput from "@/src/components/Form/FXInput";
+import { useUserRegister } from "@/src/hooks/auth.hook";
 import registerValidationSchema from "@/src/schemas/register.schema";
-import { createRegister } from "@/src/services/register";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 
@@ -13,11 +12,7 @@ import { useEffect } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 
 export default function RegisterPage() {
-  //   useEffect(() => {
-  //     if (isPending) {
-  //       // Handle Loading satate
-  //     }
-  //   }, [isPending]);
+const {mutate:handleRegister, isPending}= useUserRegister()
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
@@ -26,8 +21,7 @@ export default function RegisterPage() {
       profilePhoto:
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
     };
-
-    await createRegister(payload);
+    handleRegister(payload as any);
   };
   return (
     <div className="flex h-[calc(100vh-100px)] flex-col items-center justify-center">
@@ -67,6 +61,7 @@ export default function RegisterPage() {
             className="my-3 w-full rounded-md bg-default-900 text-default"
             size="lg"
             type="submit"
+            disabled={isPending}
           >
             Registration
           </Button>
