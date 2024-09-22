@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
 import { useFieldArray, Controller } from "react-hook-form";
 import "./labelColor.css";
 

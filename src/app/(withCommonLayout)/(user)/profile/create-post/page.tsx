@@ -1,4 +1,5 @@
 "use client";
+import CustomDynamicDoubleInput from "@/src/components/Form/CustomDynamicDoubleInput";
 import CustomDynamicInput from "@/src/components/Form/CustomDynamicInput";
 import CustomFileUpload from "@/src/components/Form/CustomFileUpload";
 import CustomForm from "@/src/components/Form/CustomForm";
@@ -71,6 +72,13 @@ const createPostPage = () => {
           <CustomReactQuill name="details" label="Details" />
 
           <CustomToggle label="Delete" name="isDelete" />
+
+          <CustomDynamicDoubleInput
+            name="faqs"
+            label="Faqs"
+            type="text"
+            option={["question", "answer"]}
+          />
 
           <Button type="submit">Submit</Button>
         </CustomForm>

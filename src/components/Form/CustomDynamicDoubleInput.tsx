@@ -1,5 +1,5 @@
-
-import { Form, Input, Button } from "antd";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
 import { useFieldArray, Controller, useFormContext } from "react-hook-form";
 import "./labelColor.css";
 
@@ -39,7 +39,7 @@ const CustomDynamicDoubleInput = ({
     <div className={`${isLabelColor ? "custom-label" : ""}`}>
       {fields.map((field, index) => (
         <div key={field.id} className="flex items-center mb-3">
-          <div className="w-full">
+          <div className="flex flex-col w-full">
             {option?.map((item,i) => (
               <Controller
               key={i}
@@ -47,29 +47,29 @@ const CustomDynamicDoubleInput = ({
                 control={control}
                 rules={{ required: `${item} is required` }}
                 render={({ field, fieldState: { error } }) => (
-                  <Form.Item
-                    label={`${label} ${item} ${index + 1}`}
-                    validateStatus={error ? "error" : ""}
-                    help={error?.message}
-                    className="w-full"
+                  <form
+                    className="w-full my-3"
                   >
                     <Input
                       {...field}
                       placeholder={`Enter ${item} ${index + 1}`}
                       type={type}
-                      size="large"
+                      size="md"
+                      label={`${label} ${item} ${index + 1}`}
+                      labelPlacement="outside"
                     />
-                  </Form.Item>
+                    {error && (
+                    <small style={{ color: "red" }}>{error.message}</small>
+                  )}
+                  </form>
                 )}
               />
             ))}
 
           
           </div>
-          <Button
-            type="link"
+          <Button    
             onClick={() => remove(index)}
-            danger
             style={{ marginLeft: "10px" }}
           >
             ✖
@@ -77,7 +77,7 @@ const CustomDynamicDoubleInput = ({
         </div>
       ))}
 
-      <Button type="link" onClick={() => append({ question: "", answer: "" })} className="-mt-32">
+      <Button  onClick={() => append({ question: "", answer: "" })} className="-mt-32">
         + Add {name}
       </Button>
     </div>
