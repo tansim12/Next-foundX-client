@@ -1,12 +1,17 @@
-import React, { ReactNode } from 'react';
 
-const profileLayout = ({children}:{children:ReactNode}) => {
-    return (
-        <div>
-            <p>Profile layout</p>
-            {children}
+import Container from "@/src/components/ui/Conteinar";
+import Sidebar from "@/src/components/ui/Sidebar";
+import { ReactNode } from "react";
+
+export default function layout({ children }: { children: ReactNode }) {
+  return (
+    <Container>
+      <div className="my-3 flex w-full gap-12">
+        <div className="w-2/5">
+          <Sidebar />
         </div>
-    );
-};
-
-export default profileLayout;
+        <div className="w-4/5">{children}</div>
+      </div>
+    </Container>
+  );
+}
