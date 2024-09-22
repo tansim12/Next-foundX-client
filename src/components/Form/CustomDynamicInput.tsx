@@ -1,8 +1,6 @@
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
-import { Input} from "@nextui-org/input";
-import { Button} from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
 import { useFieldArray, Controller } from "react-hook-form";
 import "./labelColor.css";
 
@@ -20,58 +18,47 @@ const CustomDynamicInput = ({
   label,
   isLabelColor,
 }: TInputProps) => {
-  const { fields, append, remove } = useFieldArray({
-    name, // Dynamic field name passed from parent
-  });
+  const { fields, append, remove } = useFieldArray({ name });
 
-  // Ensure at least one field is rendered initially
   useEffect(() => {
     if (fields.length === 0) {
-      append(""); // Append an initial empty field
+      append(""); // Append an initial empty object
     }
   }, [fields, append]);
 
   return (
     <div className={`${isLabelColor ? "custom-label" : ""}`}>
       {fields.map((field, index) => (
-        <div key={field.id} className="flex items-center -mb-3">
+        <div key={field.id} className="flex justify-center items-center mb-2 ">
           <Controller
-            name={`${name}.${index}`} // Dynamic name for each color input
+            name={`${name}.${index}`}
             rules={{ required: `${name} is required` }}
             render={({ field, fieldState: { error } }) => (
-              <div className="w-full">
-                {/* Replaced Text with a label */}
-                <label style={{ marginBottom: "8px", display: "block" }}>
-                  {`${label} ${index + 1}`}
-                </label>
-                <Input
-                  {...field}
-                  placeholder={`${name} ${index + 1}`}
-                  className="w-full"
-                  type={type}
-                  size="lg"
-                  
-                
-
-                />
-              </div>
+              <>
+                <div className="flex flex-col w-full">
+                  <Input
+                    {...field}
+                    label={`${label} ${index + 1}`}
+                    placeholder={`${name} ${index + 1}`}
+                    className="w-full"
+                    labelPlacement="outside"
+                    type={type}
+                    size="lg"
+                  />
+                  {error && (
+                    <small style={{ color: "red" }}>{error.message}</small>
+                  )}
+                </div>
+              </>
             )}
           />
-          <Button
-           
-       
-          
-            onClick={() => remove(index)}
-     
-          >
+          <button onClick={() => remove(index)} className="ml-4 ">
             ✖
-          </Button>
+          </button>
         </div>
       ))}
 
-      <Button  onClick={() => append("")}>
-        + Add
-      </Button>
+      <button onClick={() => append("")}>+ Add</button>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Input } from "@nextui-org/input";
+
 import { Button } from "@nextui-org/button";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 
 type TFileUploadProps = {
   name: string;
@@ -25,28 +25,29 @@ const CustomFileUpload = ({
   });
 
   const [fileList, setFileList] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the input
 
-  // Update fileList state when inputValue changes
-  useEffect(() => {
-    if (inputValue) {
-      setFileList(Array.from(inputValue));
+  // Handle file selection
+  const handleFileChange = (files: FileList | null) => {
+    if (files) {
+      const newFiles = Array.from(files);
+      setFileList((prevFiles) => [...prevFiles, ...newFiles]);
+      changeOnValue([...fileList, ...newFiles]); // Notify parent of the updated list
     }
-    changeOnValue(inputValue);
-  }, [inputValue]);
+  };
 
-  // Handle file removal by creating a new FileList
+  // Handle file removal
   const handleRemove = (index: number) => {
     const updatedFileList = fileList.filter((_, i) => i !== index);
-    setFileList(updatedFileList);
+    setFileList(updatedFileList); // Update file list
 
-    // Create a new FileList
-    const dataTransfer = new DataTransfer();
-    updatedFileList.forEach((file) => {
-      dataTransfer.items.add(file);
-    });
+    // Update parent with the updated file list
+    changeOnValue(updatedFileList);
 
-    // Trigger change event with the new FileList
-    changeOnValue(dataTransfer.files);
+    // Clear the file input value to allow re-selecting the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -54,10 +55,7 @@ const CustomFileUpload = ({
       <Controller
         name={name}
         control={control}
-        render={({
-          field: { onChange, ...field },
-          fieldState: { error },
-        }) => (
+        render={({ field: { onChange, ...field }, fieldState: { error } }) => (
           <>
             {/* Label */}
             {label && (
@@ -73,13 +71,16 @@ const CustomFileUpload = ({
             )}
 
             {/* Input for file upload */}
-            <Input
+            <input
               {...field}
               type={type}
-              style={{width:"100%"}}
               multiple
-              onChange={(e) => onChange(e.target?.files)}
+              ref={fileInputRef} // Attach ref to clear the input
+              onChange={(e) => handleFileChange(e.target.files)} // Handle file selection
+              style={{ display: "block", marginBottom: "8px" }}
             />
+
+            {/* Display error message if validation fails */}
             {error && (
               <small style={{ color: "red" }}>{error?.message}</small>
             )}
@@ -102,7 +103,7 @@ const CustomFileUpload = ({
                     }}
                   />
                   <p style={{ fontSize: "12px" }}>{file.name}</p>
-                  <Button         
+                  <Button
                     onClick={() => handleRemove(index)}
                     style={{
                       position: "absolute",

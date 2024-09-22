@@ -1,6 +1,7 @@
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Select, SelectItem } from "@nextui-org/select";
 import "./labelColor.css";
+import { useEffect } from "react";
 
 type TPHSelectProps = {
   label: string;
@@ -11,9 +12,10 @@ type TPHSelectProps = {
   mode?: "multiple" | undefined; // multiple selection mode
   isLabelColor?: boolean;
   placeholder?: string;
+  changeOnValue: any;
 };
 
-const CustomSelect = ({
+const CustomSelectWithWatch = ({
   label,
   name,
   options = [], // Default to an empty array
@@ -21,7 +23,16 @@ const CustomSelect = ({
   mode,
   isLabelColor,
   placeholder,
+  changeOnValue,
 }: TPHSelectProps) => {
+  const { control } = useFormContext();
+  const inputValue = useWatch({
+    control,
+    name,
+  });
+  useEffect(() => {
+    changeOnValue(inputValue);
+  }, [inputValue]);
   return (
     <div className={`${isLabelColor ? "custom-label" : ""}`}>
       <Controller
@@ -74,4 +85,4 @@ const CustomSelect = ({
   );
 };
 
-export default CustomSelect;
+export default CustomSelectWithWatch;
