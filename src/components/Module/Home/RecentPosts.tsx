@@ -6,7 +6,6 @@ const RecentPosts = async () => {
   const { data: posts } = await getResentPost();
   console.log(posts?.length);
   
-
   return (
     <>
       <div className="my-20 text-center">RecentPosts</div>

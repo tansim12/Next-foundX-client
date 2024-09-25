@@ -15,11 +15,17 @@ import CustomDatePicker from "@/src/components/Form/CustomDatePicker";
 import { dateToISO } from "@/src/utils/dateToISO";
 import { useUser } from "@/src/context/user.provider";
 import { useCreatePost } from "@/src/hooks/post.hook";
+import { useRouter } from "next/navigation";
+import Loading from "@/src/components/ui/Loading";
 const createPostPage = () => {
   const [imageFiles, setImageFiles] = useState([]);
   const { user } = useUser();
-  const { mutate: handleCreatePost, isPending: createPostPending } =
-    useCreatePost();
+  const navigate = useRouter();
+  const {
+    mutate: handleCreatePost,
+    isPending: createPostPending,
+    isSuccess: createPostSuccess,
+  } = useCreatePost();
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
     const payload = {
@@ -27,8 +33,6 @@ const createPostPage = () => {
       dateFound: dateToISO(data?.dateFound),
       user: user?._id,
     };
-    console.log(payload);
-
     try {
       const formData = new FormData();
       formData.append("data", JSON.stringify(payload));
@@ -41,17 +45,18 @@ const createPostPage = () => {
       console.log(error?.message);
     }
   };
+
+  if (!createPostPending && createPostSuccess) {
+    navigate.push("/");
+  }
+
   const allDistricts = allDistict();
   const cityOptions = allDistricts?.sort().map((item: string) => ({
     value: item,
     label: item,
   }));
 
-  const {
-    data: categoryData,
-    isLoading: categoryLoading,
-    isSuccess: categorySuccess,
-  } = useGetAllCategories();
+  const { data: categoryData } = useGetAllCategories();
 
   const categoryOptions = categoryData?.data?.sort().map((item: any) => ({
     value: item?._id,
@@ -60,42 +65,52 @@ const createPostPage = () => {
 
   return (
     <>
-      <div className="text-3xl text-center my-5">createPostPage</div>
+      {!createPostPending ? (
+        <div>
+          <div className="text-3xl text-center my-5">createPostPage</div>
 
-      <div>
-        <CustomForm onSubmit={onSubmit}>
-          <CustomInput name="title" label="Title" type="text" />
-          <CustomInput name="location" label="Location" type="text" />
+          <div>
+            <CustomForm onSubmit={onSubmit}>
+              <CustomInput name="title" label="Title" type="text" />
+              <CustomInput name="location" label="Location" type="text" />
 
-          <CustomSelect
-            name="city"
-            label="City"
-            placeholder="Select City"
-            options={cityOptions}
-          />
+              <CustomSelect
+                name="city"
+                label="City"
+                placeholder="Select City"
+                options={cityOptions}
+              />
 
-          <CustomDatePicker label="Found Date" name="dateFound" />
+              <CustomDatePicker label="Found Date" name="dateFound" />
 
-          <CustomSelect
-            name="category"
-            label="Category"
-            placeholder="Select Category"
-            options={categoryOptions}
-          />
+              <CustomSelect
+                name="category"
+                label="Category"
+                placeholder="Select Category"
+                options={categoryOptions}
+              />
 
-          <CustomReactQuill name="description" label="Description" />
+              <CustomReactQuill name="description" label="Description" />
 
-          <CustomDynamicInput name="questions" label="Questions" type="text" />
+              <CustomDynamicInput
+                name="questions"
+                label="Questions"
+                type="text"
+              />
 
-          <CustomFileUpload
-            name="images"
-            label="Images"
-            changeOnValue={setImageFiles}
-          />
+              <CustomFileUpload
+                name="images"
+                label="Images"
+                changeOnValue={setImageFiles}
+              />
 
-          <Button type="submit">Submit</Button>
-        </CustomForm>
-      </div>
+              <Button type="submit">Submit</Button>
+            </CustomForm>
+          </div>
+        </div>
+      ) : (
+        <Loading />
+      )}
     </>
   );
 };
