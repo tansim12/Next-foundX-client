@@ -3,7 +3,7 @@ import { delay } from "../utils/delay";
 
 export const getResentPost = async () => {
   const res = await fetch(
-    `${envConfig?.backendUrl}/items?sortBy=-createdAt&limit=3`
+    `${envConfig?.backendUrl}/items?sortBy=-createdAt&limit=5`
   );
   const data = await res.json();
   return data;

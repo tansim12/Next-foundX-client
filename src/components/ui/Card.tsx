@@ -22,7 +22,7 @@ const Card = ({ post }: { post: IPost }) => {
         removeWrapper
         alt="Card example background"
         className="scale-120 z-0 h-full w-full -translate-y-6 object-cover"
-        src={images[0]}
+        src={images?.[0]}
       />
       <CardFooter className="absolute bottom-0 z-10 justify-between border-t-1 border-zinc-100/50 bg-white/30">
         <div>

@@ -1,31 +1,62 @@
 "use client";
-import CustomCollapse from "@/src/components/Form/CustomCollapse";
-import CustomCollapseMultiple from "@/src/components/Form/CustomCollapseMultiple";
 import CustomDynamicDoubleInput from "@/src/components/Form/CustomDynamicDoubleInput";
-import CustomDynamicInput from "@/src/components/Form/CustomDynamicInput";
 import CustomFileUpload from "@/src/components/Form/CustomFileUpload";
 import CustomForm from "@/src/components/Form/CustomForm";
-import CustomRangePicker from "@/src/components/Form/CustomRangePicker";
+import CustomInput from "@/src/components/Form/CustomInput";
 import CustomReactQuill from "@/src/components/Form/CustomReactQuill";
 import CustomSelect from "@/src/components/Form/CustomSelect";
-import CustomSelectWithWatch from "@/src/components/Form/CustomSelectWithWatch";
-import CustomTimePicker from "@/src/components/Form/CustomTimePicker";
-import CustomToggle from "@/src/components/Form/CustomToggle";
 import { Button } from "@nextui-org/button";
 import React, { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
-
+import { allDistict } from "@bangladeshi/bangladesh-address";
+import { useGetAllCategories } from "@/src/hooks/categories.hook";
+import CustomDynamicInput from "@/src/components/Form/CustomDynamicInput";
+import CustomDatePicker from "@/src/components/Form/CustomDatePicker";
+import { dateToISO } from "@/src/utils/dateToISO";
+import { useUser } from "@/src/context/user.provider";
+import { useCreatePost } from "@/src/hooks/post.hook";
 const createPostPage = () => {
   const [imageFiles, setImageFiles] = useState([]);
-  const [multiSelectWatch, setMultiSelectWatch] = useState(null);
-  const [issFiltersSelected, setIsFiltersSelected] = useState(null);
-  const [timeRange, setTimeRange] = useState(null);
-  const [time, setTime] = useState(null);
+  const { user } = useUser();
+  const { mutate: handleCreatePost, isPending: createPostPending } =
+    useCreatePost();
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
-  };
+    const payload = {
+      ...data,
+      dateFound: dateToISO(data?.dateFound),
+      user: user?._id,
+    };
+    console.log(payload);
 
-  console.log(timeRange);
+    try {
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(payload));
+      for (let image of imageFiles) {
+        formData.append("itemImages", image);
+      }
+
+      handleCreatePost(formData as any);
+    } catch (error: any) {
+      console.log(error?.message);
+    }
+  };
+  const allDistricts = allDistict();
+  const cityOptions = allDistricts?.sort().map((item: string) => ({
+    value: item,
+    label: item,
+  }));
+
+  const {
+    data: categoryData,
+    isLoading: categoryLoading,
+    isSuccess: categorySuccess,
+  } = useGetAllCategories();
+
+  const categoryOptions = categoryData?.data?.sort().map((item: any) => ({
+    value: item?._id,
+    label: item?.name,
+  }));
 
   return (
     <>
@@ -33,6 +64,27 @@ const createPostPage = () => {
 
       <div>
         <CustomForm onSubmit={onSubmit}>
+          <CustomInput name="title" label="Title" type="text" />
+          <CustomInput name="location" label="Location" type="text" />
+
+          <CustomSelect
+            name="city"
+            label="City"
+            placeholder="Select City"
+            options={cityOptions}
+          />
+
+          <CustomDatePicker label="Found Date" name="dateFound" />
+
+          <CustomSelect
+            name="category"
+            label="Category"
+            placeholder="Select Category"
+            options={categoryOptions}
+          />
+
+          <CustomReactQuill name="description" label="Description" />
+
           <CustomDynamicInput name="questions" label="Questions" type="text" />
 
           <CustomFileUpload
@@ -41,78 +93,6 @@ const createPostPage = () => {
             changeOnValue={setImageFiles}
           />
 
-          <CustomSelect
-            name="category"
-            label="category"
-            placeholder="Select Category"
-            options={[
-              { label: "tansim", value: "tansim" },
-              { label: "tashdid", value: "tashdid" },
-            ]}
-          />
-          <CustomSelectWithWatch
-            changeOnValue={setMultiSelectWatch}
-            name="friends"
-            label="Friends"
-            mode="multiple"
-            placeholder="Select Friends"
-            options={[
-              { label: "tansim", value: "tansim" },
-              { label: "tashdid", value: "tashdid" },
-              { label: "sojib", value: "sojib" },
-              { label: "joy", value: "joy" },
-            ]}
-          />
-          <CustomSelect
-            name="friends"
-            label="Friends"
-            mode="multiple"
-            placeholder="Select Friends"
-            options={[
-              { label: "tansim", value: "tansim" },
-              { label: "tashdid", value: "tashdid" },
-              { label: "sojib", value: "sojib" },
-              { label: "joy", value: "joy" },
-            ]}
-          />
-
-          <CustomReactQuill name="details" label="Details" />
-
-          <CustomToggle label="Delete" name="isDelete" />
-
-          <CustomDynamicDoubleInput
-            name="faqs"
-            label="Faqs"
-            type="text"
-            option={["question", "answer"]}
-          />
-
-          <CustomCollapse
-            label="Availability"
-            name="availability"
-            changeOnValue={setIsFiltersSelected}
-            options={[
-              { label: "isStock", value: "isStock" },
-              { label: "stockOut", value: "stockOut" },
-            ]}
-          />
-          <CustomCollapseMultiple
-            label="dummy"
-            name="dummy"
-            changeOnValue={setIsFiltersSelected}
-            options={[
-              { label: "isStock", value: "isStock" },
-              { label: "stockOut", value: "stockOut" },
-            ]}
-          />
-
-          <CustomRangePicker
-            name="dateRange"
-            label="Select Date Range"
-            changeOnValue={setTimeRange}
-          />
-
-          <CustomTimePicker name="time" label="Select Time" />
           <Button type="submit">Submit</Button>
         </CustomForm>
       </div>

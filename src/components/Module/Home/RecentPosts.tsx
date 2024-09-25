@@ -4,6 +4,8 @@ import Card from "../../ui/Card";
 
 const RecentPosts = async () => {
   const { data: posts } = await getResentPost();
+  console.log(posts?.length);
+  
 
   return (
     <>
